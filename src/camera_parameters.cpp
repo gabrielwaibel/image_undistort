@@ -10,6 +10,7 @@ BaseCameraParameters::BaseCameraParameters(const ros::NodeHandle& nh,
 
   XmlRpc::XmlRpcValue K_in;
   bool K_loaded = false;
+  std::cout << camera_namespace << std::endl;
   if (nh.getParam(camera_namespace + "/K", K_in)) {
     xmlRpcToMatrix(K_in, &K_);
     K_loaded = true;
@@ -25,7 +26,7 @@ BaseCameraParameters::BaseCameraParameters(const ros::NodeHandle& nh,
       throw std::runtime_error(
           "Intrinsics vector must have at least 4 values (Fx,Fy,Cx,Cy)");
     }
-
+    
     K_ = Eigen::Matrix3d::Identity();
     K_(0, 0) = intrinsics_in[intrinsics_in.size() - 4];
     K_(1, 1) = intrinsics_in[intrinsics_in.size() - 3];

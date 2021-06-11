@@ -1,0 +1,7 @@
+cam4:
+  camera_model: pinhole
+  distortion_coeffs: [-0.0435067508, 0.0048952632, -0.0035388936, 0.0003353017]
+  distortion_model: equidistant
+  intrinsics: [349.9204665671, 344.3032414701, 349.8220154122, 258.449836991]
+  resolution: [720, 540]
+  rostopic: /alphasense_driver_ros/cam4

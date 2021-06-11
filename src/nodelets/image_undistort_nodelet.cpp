@@ -6,7 +6,9 @@
 namespace image_undistort {
 
 class ImageUndistortNodelet : public nodelet::Nodelet {
+  
   virtual void onInit() {
+    std::cout << "nodelet " << std::endl;
     try {
       image_undistort_ = std::make_shared<ImageUndistort>(
           getNodeHandle(), getPrivateNodeHandle());

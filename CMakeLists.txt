@@ -5,10 +5,11 @@ project(image_undistort)
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
 # Set compile flags (-Ofast actually makes a big difference over -O3 here (maybe 20% faster)
-set(CMAKE_CXX_FLAGS "-std=c++11 -Ofast")
+set(CMAKE_CXX_FLAGS "-std=c++14 -Ofast")
 
 find_package(Eigen3 REQUIRED)
 find_package(catkin REQUIRED COMPONENTS
+  darknet_ros_msgs
   roscpp
   roslib
   pcl_ros

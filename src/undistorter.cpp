@@ -69,6 +69,105 @@ void Undistorter::undistortImage(const cv::Mat& image,
   }
 }
 
+void Undistorter::undistortBoundingBox(const std::vector<int>& limits, std::vector<int>& newLimits){
+  
+  int xmin = limits.at(0);
+  int xmax = limits.at(1);
+  int ymin = limits.at(2);
+  int ymax = limits.at(3);
+  
+  // Insert in map
+  
+  // int newXmin = std::min(map_x_.at<int>(xmin, ymin), map_x_.at<int>(xmin, ymax));
+
+  std::vector<double> D;
+  if (used_camera_parameters_pair_.distortionProcessing() ==
+      DistortionProcessing::UNDISTORT) {
+    D = used_camera_parameters_pair_.getInputPtr()->D();
+  } else {
+    D = std::vector<double>(0, 5);
+  }
+
+  // xmin
+  Eigen::Vector2d pixel_location(xmin, ymin);
+  Eigen::Vector2d distorted_pixel_location1;
+  distortPixel(
+      used_camera_parameters_pair_.getInputPtr()->K(),
+      used_camera_parameters_pair_.getInputPtr()->R(),
+      used_camera_parameters_pair_.getOutputPtr()->P(),
+      used_camera_parameters_pair_.getInputPtr()->distortionModel(), D,
+      pixel_location, &distorted_pixel_location1);
+  pixel_location(0) = xmin;
+  pixel_location(1) = ymax;
+  Eigen::Vector2d distorted_pixel_location2;
+  distortPixel(
+      used_camera_parameters_pair_.getInputPtr()->K(),
+      used_camera_parameters_pair_.getInputPtr()->R(),
+      used_camera_parameters_pair_.getOutputPtr()->P(),
+      used_camera_parameters_pair_.getInputPtr()->distortionModel(), D,
+      pixel_location, &distorted_pixel_location2);
+  int newXmin = std::min(distorted_pixel_location1(0), distorted_pixel_location2(0));
+
+  // xmax
+  pixel_location(0) = xmax;
+  pixel_location(1) = ymin;
+  distortPixel(
+      used_camera_parameters_pair_.getInputPtr()->K(),
+      used_camera_parameters_pair_.getInputPtr()->R(),
+      used_camera_parameters_pair_.getOutputPtr()->P(),
+      used_camera_parameters_pair_.getInputPtr()->distortionModel(), D,
+      pixel_location, &distorted_pixel_location1);
+  pixel_location(0) = xmax;
+  pixel_location(1) = ymax;
+  distortPixel(
+      used_camera_parameters_pair_.getInputPtr()->K(),
+      used_camera_parameters_pair_.getInputPtr()->R(),
+      used_camera_parameters_pair_.getOutputPtr()->P(),
+      used_camera_parameters_pair_.getInputPtr()->distortionModel(), D,
+      pixel_location, &distorted_pixel_location2);
+  int newXmax = std::min(distorted_pixel_location1(0), distorted_pixel_location2(0));
+
+  // ymin
+  pixel_location(0) = xmin;
+  pixel_location(1) = ymin;
+  distortPixel(
+      used_camera_parameters_pair_.getInputPtr()->K(),
+      used_camera_parameters_pair_.getInputPtr()->R(),
+      used_camera_parameters_pair_.getOutputPtr()->P(),
+      used_camera_parameters_pair_.getInputPtr()->distortionModel(), D,
+      pixel_location, &distorted_pixel_location1);
+  pixel_location(0) = xmax;
+  pixel_location(1) = ymin;
+  distortPixel(
+      used_camera_parameters_pair_.getInputPtr()->K(),
+      used_camera_parameters_pair_.getInputPtr()->R(),
+      used_camera_parameters_pair_.getOutputPtr()->P(),
+      used_camera_parameters_pair_.getInputPtr()->distortionModel(), D,
+      pixel_location, &distorted_pixel_location2);
+  int newYmin = std::min(distorted_pixel_location1(0), distorted_pixel_location2(0));
+
+  // ymax
+  pixel_location(0) = xmin;
+  pixel_location(1) = ymax;
+  distortPixel(
+      used_camera_parameters_pair_.getInputPtr()->K(),
+      used_camera_parameters_pair_.getInputPtr()->R(),
+      used_camera_parameters_pair_.getOutputPtr()->P(),
+      used_camera_parameters_pair_.getInputPtr()->distortionModel(), D,
+      pixel_location, &distorted_pixel_location1);
+  pixel_location(0) = xmax;
+  pixel_location(1) = ymax;
+  distortPixel(
+      used_camera_parameters_pair_.getInputPtr()->K(),
+      used_camera_parameters_pair_.getInputPtr()->R(),
+      used_camera_parameters_pair_.getOutputPtr()->P(),
+      used_camera_parameters_pair_.getInputPtr()->distortionModel(), D,
+      pixel_location, &distorted_pixel_location2);
+  int newYmax = std::min(distorted_pixel_location1(0), distorted_pixel_location2(0));
+
+  newLimits = {newXmin, newXmax, newYmin, newYmax};
+}
+
 const CameraParametersPair& Undistorter::getCameraParametersPair() {
   return used_camera_parameters_pair_;
 }

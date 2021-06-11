@@ -3,9 +3,11 @@
 
 #include <Eigen/Dense>
 
-#include <cv.h>
-#include <highgui.h>
-#include <opencv2/imgproc/imgproc.hpp>
+
+#include <opencv2/highgui.hpp>
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/opencv.hpp>
 
 #include "image_undistort/camera_parameters.h"
 
@@ -16,6 +18,7 @@ class Undistorter {
   Undistorter(const CameraParametersPair& input_camera_parameters_pair);
 
   void undistortImage(const cv::Mat& image, cv::Mat* undistored_image);
+  void undistortBoundingBox(const std::vector<int>& limits, std::vector<int>& newLimits);
 
   // get camera parameters used to build undistorter
   const CameraParametersPair& getCameraParametersPair();

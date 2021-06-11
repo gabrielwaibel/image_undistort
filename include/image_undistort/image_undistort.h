@@ -15,6 +15,12 @@
 #include <sensor_msgs/CameraInfo.h>
 #include <sensor_msgs/Image.h>
 
+#include "darknet_ros_msgs/BoundingBox.h"
+#include "darknet_ros_msgs/BoundingBoxes.h"
+#include <message_filters/subscriber.h>
+#include <message_filters/synchronizer.h>
+#include <message_filters/sync_policies/exact_time.h>
+
 #include "image_undistort/undistorter.h"
 
 namespace image_undistort {
@@ -25,7 +31,7 @@ namespace image_undistort {
 constexpr int kImageQueueSize = 10;
 // true to load input cam_info from ros parameters, false to get it from a
 // cam_info topic
-constexpr bool kDefaultInputCameraInfoFromROSParams = false;
+constexpr bool kDefaultInputCameraInfoFromROSParams = true;
 // source of output camera information, the options are as follows-
 //  "auto_generated": (default), automatically generated based on the input, the
 //    focal length is the average of fx and fy of the input, the center point is
@@ -58,7 +64,7 @@ const std::string kDefaultOutputImageType = "";
 // resizing the image by this scale factor.
 constexpr double kDefaultScale = 1.0;
 // if a tf between the input and output frame should be created
-constexpr bool kDefaultPublishTF = true;
+constexpr bool kDefaultPublishTF = false;
 // name of output image frame
 const std::string kDefaultOutputFrame = "output_camera";
 // rename input frames
@@ -84,6 +90,8 @@ class ImageUndistort {
                             sensor_msgs::CameraInfo* loaded_camera_info,
                             std::string* image_topic);
 
+  void imageCallbackBB(const sensor_msgs::ImageConstPtr& image_msg_in, const darknet_ros_msgs::BoundingBoxes::ConstPtr& bounding_box_msg);
+
   void imageCallback(const sensor_msgs::ImageConstPtr& image_msg_in);
 
   void cameraCallback(const sensor_msgs::ImageConstPtr& image_msg,
@@ -105,6 +113,13 @@ class ImageUndistort {
   image_transport::CameraPublisher camera_pub_;  // output image and camera_info
   image_transport::Publisher image_pub_;         // output image
   ros::Publisher camera_info_pub_;               // output camera_info
+  ros::Publisher bounding_box_pub_;              // output new bounding boxes
+  
+  typedef message_filters::sync_policies::ExactTime<sensor_msgs::Image, darknet_ros_msgs::BoundingBoxes> MySyncPolicy;
+	typedef message_filters::Synchronizer<MySyncPolicy> Sync;
+	std::vector<Sync*> sync_vector;
+	std::vector<message_filters::Subscriber<sensor_msgs::Image>*> detection_image_subs;
+	std::vector<message_filters::Subscriber<darknet_ros_msgs::BoundingBoxes>*> bounding_box_subs;
 
   // undistorter
   std::shared_ptr<Undistorter> undistorter_ptr_;

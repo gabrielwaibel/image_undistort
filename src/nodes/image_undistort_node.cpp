@@ -7,6 +7,7 @@ int main(int argc, char** argv) {
   nodelet::M_string remap(ros::names::getRemappings());
   nodelet::V_string nargv;
   std::string nodelet_name = ros::this_node::getName();
+  std::cout << nodelet_name << " nodelet" << std::endl;
   ROS_INFO_STREAM("Started " << nodelet_name << " nodelet.");
   nodelet.load(nodelet_name, "image_undistort/ImageUndistortNodelet", remap,
                nargv);

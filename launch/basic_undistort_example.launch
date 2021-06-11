@@ -1,8 +1,8 @@
 <launch>
 
-<arg name="input_camera_name" default="cam0" />
+<arg name="input_camera_name" default="alphasense_driver_ros/cam4" />
 <arg name="scale" default="1.0" />
-<arg name="calib_path" default="/home/z/Desktop/cal/camchain-.2018-04-25-20-16-31.yaml"/>
+<arg name="calib_path" default="/home/gabriel/catkin_ws/src/image_undistort/cfg/example_input_config.yaml"/>
 
   <node name="image_undistort_node" pkg="image_undistort" type="image_undistort_node">
     <param name="input_camera_namespace" value="cam0"/>      
